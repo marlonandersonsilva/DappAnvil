@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Wallet, Coins, ArrowRightLeft, LayoutDashboard, History, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import ConnectWallet from './components/ConnectWallet';
@@ -10,7 +10,7 @@ import { TransactionType } from './types';
 
 function App() {
   const [account, setAccount] = useState<string>('');
-  const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
+  //const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [tokenContract, setTokenContract] = useState<ethers.Contract | null>(null);
   const [balance, setBalance] = useState<string>('0');
@@ -47,13 +47,23 @@ function App() {
       setError("Error fetching token balance. Please try again.");
     }
   };
+  const disconnectWallet = () => {
+    setAccount('');
+    setSigner(null);
+    setTokenContract(null);
+    setBalance('0');
+    setTransactions([]);
+    setError(null);
+    console.log("Wallet disconnected");
+  };
+
 
   useEffect(() => {
     const checkIfWalletIsConnected = async () => {
       try {
         if (window.ethereum) {
           const provider = new ethers.BrowserProvider(window.ethereum);
-          setProvider(provider);
+          //setProvider(provider);
           
           const accounts = await provider.send("eth_accounts", []);
           
@@ -97,7 +107,7 @@ function App() {
       }
 
       const provider = new ethers.BrowserProvider(window.ethereum);
-      setProvider(provider);
+      //setProvider(provider);
       
       // Request accounts
       const accounts = await provider.send("eth_requestAccounts", []);
@@ -179,11 +189,21 @@ function App() {
             <Coins className="h-8 w-8 text-blue-500 mr-2" />
             <h1 className="text-2xl font-bold">Anvil DApp</h1>
           </div>
+          <div className="flex items-center space-x-4">
+          {account && (
+            <button
+        onClick={disconnectWallet}
+        className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+      >
+        Disconnect
+           </button>
+    )}
           <ConnectWallet 
             account={account} 
             connectWallet={connectWallet} 
             isLoading={isLoading || isConnecting} 
           />
+          </div>
         </header>
 
         {error && (
